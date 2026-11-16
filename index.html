@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Southeast Michigan Nonprofits</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --text: #1f2328; --muted: #5f6670;
+    --border: #d8dbe0; --accent: #1d5fa8; --row-alt: #f1f3f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181c; --surface: #1f2228; --text: #e8eaed; --muted: #a0a6ae;
+      --border: #353a42; --accent: #6aa8f0; --row-alt: #252930;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 16px; }
+  h1 { margin: 0 0 4px; font-size: 1.75rem; }
+  .sub { margin: 0 0 24px; color: var(--muted); }
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  input[type="search"] {
+    width: 100%; padding: 10px 12px; font-size: 1rem;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); color: var(--text);
+  }
+  input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .table-wrap {
+    margin-top: 20px; overflow-x: auto;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  tbody tr:nth-child(even) { background: var(--row-alt); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  #empty { padding: 16px 14px; color: var(--muted); display: none; }
+  .count { margin-top: 10px; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Southeast Michigan Nonprofits</h1>
+  <p class="sub">Sample data: these organizations are made up.</p>
+
+  <label for="search">Search</label>
+  <input id="search" type="search" placeholder="Search by name, city, or field…" autocomplete="off">
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>City</th>
+          <th>Field</th>
+          <th class="num">Revenue</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="empty">No organizations match your search.</div>
+  </div>
+  <p class="count" id="count"></p>
+</main>
+
+<script>
+  const organizations = [
+    { name: "Great Lakes Literacy Alliance", city: "Detroit",   field: "Education",   revenue: 1250000 },
+    { name: "Huron River Green Futures",     city: "Ann Arbor", field: "Environment", revenue: 640000 },
+    { name: "Oakland County Food Bridge",    city: "Pontiac",   field: "Hunger Relief", revenue: 2875000 }
+  ];
+
+  const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  const rowsEl = document.getElementById("rows");
+  const emptyEl = document.getElementById("empty");
+  const countEl = document.getElementById("count");
+
+  function render(query) {
+    const q = query.trim().toLowerCase();
+    const matches = organizations.filter(o =>
+      [o.name, o.city, o.field].some(v => v.toLowerCase().includes(q))
+    );
+    rowsEl.innerHTML = "";
+    for (const o of matches) {
+      const tr = document.createElement("tr");
+      [o.name, o.city, o.field].forEach(v => {
+        const td = document.createElement("td");
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      const rev = document.createElement("td");
+      rev.className = "num";
+      rev.textContent = money.format(o.revenue);
+      tr.appendChild(rev);
+      rowsEl.appendChild(tr);
+    }
+    emptyEl.style.display = matches.length ? "none" : "block";
+    countEl.textContent = `Showing ${matches.length} of ${organizations.length} organizations`;
+  }
+
+  document.getElementById("search").addEventListener("input", e => render(e.target.value));
+  render("");
+</script>
+</body>
+</html>
