@@ -1,1 +1,2 @@
-# southeast-michigan-nonprofits
+# southeast-michigan-nonprofits 
+Add nonprofit table page”
